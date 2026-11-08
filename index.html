@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>Qur'on</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg1:#06251f; --bg2:#0b3d33; --gold:#e3c27a; --gold2:#b8943f;
+  --paper:rgba(255,250,236,.96); --ink:#1d2b26; --muted:#6b7a72; --card:rgba(255,255,255,.07);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;font-family:Inter,system-ui,sans-serif;color:#f4efe0;
+  background:
+   radial-gradient(1200px 600px at 50% -10%,#14604f55,transparent 60%),
+   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='none' stroke='%23e3c27a' stroke-opacity='.10' stroke-width='1'%3E%3Cpath d='M40 4l9 18 18-9-9 18 18 9-18 9 9 18-18-9-9 18-9-18-18 9 9-18-18-9 18-9-9-18 18 9z'/%3E%3Ccircle cx='40' cy='40' r='9'/%3E%3C/g%3E%3C/svg%3E"),
+   linear-gradient(160deg,var(--bg1),var(--bg2));
+  background-attachment:fixed}
+#app{display:flex;flex-direction:column;height:100%;max-width:720px;margin:0 auto}
+header{display:flex;align-items:center;gap:8px;padding:calc(10px + env(safe-area-inset-top)) 12px 10px}
+header .title{flex:1;text-align:center;cursor:pointer}
+header .title b{display:block;font-size:16px;color:var(--gold)}
+header .title small{opacity:.7;font-size:12px}
+.ib{background:var(--card);border:1px solid #e3c27a33;color:var(--gold);border-radius:12px;width:40px;height:40px;font-size:18px;display:grid;place-items:center;cursor:pointer}
+.ib:active{transform:scale(.95)}
+main{flex:1;overflow-y:auto;padding:4px 12px 110px;scroll-behavior:smooth}
+.sheet{background:var(--paper);color:var(--ink);border-radius:18px;padding:14px 14px 6px;border:2px solid var(--gold2);box-shadow:0 10px 30px #0006, inset 0 0 0 4px #fffaf0, inset 0 0 0 5px #e3c27a88}
+.surah-head{margin:10px 0 14px;text-align:center;padding:10px;border-radius:12px;background:linear-gradient(90deg,transparent,#e3c27a44,transparent);border-top:1px solid var(--gold2);border-bottom:1px solid var(--gold2)}
+.surah-head .ar{font-family:'Amiri Quran',serif;font-size:26px;color:#0b3d33}
+.surah-head small{display:block;color:var(--muted);font-size:12px}
+.bism{font-family:'Amiri Quran',serif;text-align:center;font-size:24px;color:#0b3d33;margin:6px 0 12px}
+.mushaf{font-family:'Amiri Quran',serif;direction:rtl;text-align:justify;line-height:2.4;padding:4px 2px 12px}
+.ay{cursor:pointer;border-radius:8px;transition:background .2s}
+.ay.on{background:#e3c27a66}
+.num{font-family:'Amiri Quran',serif;color:var(--gold2);font-size:.8em;margin:0 3px}
+.card{border-bottom:1px dashed #b8943f66;padding:12px 2px}
+.card:last-child{border:0}
+.card .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.badge{background:#0b3d33;color:var(--gold);border-radius:20px;font-size:12px;padding:2px 10px}
+.play{border:0;background:#0b3d33;color:var(--gold);width:34px;height:34px;border-radius:50%;font-size:14px;cursor:pointer}
+.card .ar{font-family:'Amiri Quran',serif;direction:rtl;text-align:right;line-height:2.2;font-size:inherit;padding:2px 4px;border-radius:10px}
+.card.on .ar{background:#e3c27a55}
+.tr{font-size:15px;line-height:1.55;margin-top:6px;color:#25352f}
+.tr i{font-style:normal;font-size:11px;color:var(--gold2);font-weight:600;margin-right:6px}
+.nav{position:fixed;left:0;right:0;bottom:0;max-width:720px;margin:0 auto;padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+  display:flex;gap:8px;align-items:center;background:linear-gradient(0deg,#041c17 60%,transparent)}
+.nav .mid{flex:1;display:flex;gap:8px}
+.btn{flex:1;background:var(--gold);color:#2a1f05;border:0;border-radius:14px;height:46px;font-weight:600;font-size:15px;cursor:pointer}
+.btn.sec{background:var(--card);color:var(--gold);border:1px solid #e3c27a44;flex:0 0 46px}
+.overlay{position:fixed;inset:0;background:#000a;display:none;align-items:flex-end;justify-content:center;z-index:10}
+.overlay.show{display:flex}
+.panel{width:100%;max-width:720px;max-height:82%;overflow-y:auto;background:#0a2f27;border-radius:20px 20px 0 0;border-top:2px solid var(--gold2);padding:14px 14px calc(18px + env(safe-area-inset-bottom))}
+.panel h3{margin:4px 0 12px;color:var(--gold)}
+.row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.chip{padding:8px 14px;border-radius:20px;background:var(--card);border:1px solid #e3c27a33;font-size:14px;cursor:pointer}
+.chip.sel{background:var(--gold);color:#2a1f05;font-weight:600}
+.lbl{font-size:12px;opacity:.7;margin:8px 0 6px}
+input.search{width:100%;padding:12px;border-radius:12px;border:1px solid #e3c27a44;background:#ffffff12;color:#fff;font-size:15px;margin-bottom:10px}
+.s-item{display:flex;align-items:center;gap:12px;padding:10px;border-radius:12px;cursor:pointer}
+.s-item:active{background:var(--card)}
+.s-n{width:34px;height:34px;display:grid;place-items:center;border:1px solid var(--gold2);border-radius:8px;transform:rotate(45deg);flex:0 0 auto}
+.s-n span{transform:rotate(-45deg);font-size:12px;color:var(--gold)}
+.s-m{flex:1}.s-m small{opacity:.65}
+.s-ar{font-family:'Amiri Quran',serif;font-size:20px;color:var(--gold)}
+.loader{text-align:center;padding:60px 0;opacity:.8}
+.err{text-align:center;padding:40px 10px}
+input[type=range]{width:100%;accent-color:#e3c27a}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <button class="ib" id="btnList" title="Suralar">☰</button>
+    <div class="title" id="title"><b id="tTop">Qur'on</b><small id="tSub">Yuklanmoqda…</small></div>
+    <button class="ib" id="btnSet" title="Sozlamalar">⚙</button>
+  </header>
+  <main id="main"><div class="loader">Yuklanmoqda…</div></main>
+  <div class="nav">
+    <button class="btn sec" id="prev" title="Oldingi sahifa">‹</button>
+    <div class="mid">
+      <button class="btn" id="playAll">▶ Tinglash</button>
+      <button class="btn sec" id="goPage" title="Sahifaga o'tish" style="flex:0 0 76px;font-size:13px;color:#e3c27a">1/604</button>
+    </div>
+    <button class="btn sec" id="next" title="Keyingi sahifa">›</button>
+  </div>
+</div>
+
+<div class="overlay" id="ovList"><div class="panel">
+  <h3>Suralar</h3>
+  <input class="search" id="q" placeholder="Qidirish (nomi yoki raqami)…">
+  <div id="slist"></div>
+</div></div>
+
+<div class="overlay" id="ovSet"><div class="panel">
+  <h3>Sozlamalar</h3>
+  <div class="lbl">Ko'rinish</div>
+  <div class="row" id="optView"></div>
+  <div class="lbl">Tarjima</div>
+  <div class="row" id="optTr"></div>
+  <div class="lbl">Qori</div>
+  <div class="row" id="optRec"></div>
+  <div class="lbl">Arab yozuvi o'lchami</div>
+  <input type="range" id="fs" min="22" max="44" step="1">
+  <div class="lbl" style="margin-top:14px">Sahifa tugagach avtomatik keyingisiga o'tish</div>
+  <div class="row" id="optAuto"></div>
+</div></div>
+
+<script>
+const tg = window.Telegram && Telegram.WebApp;
+if (tg) { tg.ready(); tg.expand(); try{tg.setHeaderColor('#06251f');tg.setBackgroundColor('#06251f');}catch(e){} }
+
+const API = 'https://api.alquran.cloud/v1';
+const RECITERS = [
+  ['ar.alafasy','Mishary Alafasy'],
+  ['ar.abdurrahmaansudais','Abdurrahman as-Sudays'],
+  ['ar.husary','Mahmud Al-Husariy'],
+  ['ar.minshawi','Al-Minshaviy'],
+  ['ar.abdulbasitmurattal','Abdulbosit Abdussamad']
+];
+const store = {
+  get(k,d){try{const v=localStorage.getItem('q_'+k);return v===null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem('q_'+k,JSON.stringify(v))}catch(e){}}
+};
+const S = {
+  page: store.get('page',1), view: store.get('view','ayat'), tr: store.get('tr','uz'),
+  rec: store.get('rec','ar.alafasy'), fs: store.get('fs',30), auto: store.get('auto',true),
+  ayahs: [], cur: -1, playing: false, surahs: []
+};
+const $ = id => document.getElementById(id);
+const cache = {};
+const audio = new Audio();
+
+/* ---------- data ---------- */
+async function getJSON(u){ const r = await fetch(u); if(!r.ok) throw new Error(r.status); return (await r.json()).data; }
+
+async function loadSurahs(){
+  const c = store.get('surahs',null);
+  if (c) { S.surahs = c; return; }
+  S.surahs = await getJSON(API+'/surah');
+  store.set('surahs', S.surahs);
+}
+
+async function loadPage(n){
+  if (cache[n]) return cache[n];
+  const d = await getJSON(`${API}/page/${n}/editions/quran-uthmani,uz.sodik,ru.kuliev`);
+  const [ar,uz,ru] = d;
+  const list = ar.ayahs.map((a,i)=>({
+    g:a.number, n:a.numberInSurah, s:a.surah.number, sName:a.surah.name, sEn:a.surah.englishName,
+    juz:a.juz, text:a.text, uz:uz.ayahs[i].text, ru:ru.ayahs[i].text
+  }));
+  cache[n] = list; return list;
+}
+
+/* ---------- render ---------- */
+const BISM_WORDS = 4;
+function stripBism(t){ const w=t.split(' '); return w.length>BISM_WORDS ? w.slice(BISM_WORDS).join(' ') : t; }
+const toAr = n => String(n).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
+
+async function render(scrollTop=true){
+  const main = $('main');
+  main.innerHTML = '<div class="loader">Yuklanmoqda…</div>';
+  try{
+    await loadSurahs().catch(()=>{});
+    S.ayahs = await loadPage(S.page);
+  }catch(e){
+    main.innerHTML = '<div class="err">Internetga ulanib bo\'lmadi.<br><br><button class="btn" id="retry" style="max-width:200px">Qayta urinish</button></div>';
+    $('retry').onclick = ()=>render();
+    return;
+  }
+  S.cur = -1;
+  const a0 = S.ayahs[0];
+  $('tTop').textContent = a0.sEn + ' · ' + a0.sName;
+  $('tSub').textContent = `${a0.juz}-juz · ${S.page}-sahifa`;
+  $('goPage').textContent = `${S.page}/604`;
+  store.set('page', S.page);
+
+  let html = '<div class="sheet">';
+  let mush = '';
+  const flush = ()=>{ if(mush){ html += `<div class="mushaf" style="font-size:${S.fs}px">${mush}</div>`; mush=''; } };
+  S.ayahs.forEach((a,i)=>{
+    const first = a.n===1;
+    let text = a.text;
+    if (first && a.s!==1 && a.s!==9) text = stripBism(text);
+    if (S.view==='mushaf'){
+      if (first){ flush(); html += header(a); }
+      mush += `<span class="ay" data-i="${i}">${text}<span class="num">﴿${toAr(a.n)}﴾</span></span> `;
+    } else {
+      if (first){ html += header(a); }
+      let tr='';
+      if (S.tr==='uz'||S.tr==='both') tr += `<div class="tr"><i>UZ</i>${esc(a.uz)}</div>`;
+      if (S.tr==='ru'||S.tr==='both') tr += `<div class="tr"><i>RU</i>${esc(a.ru)}</div>`;
+      html += `<div class="card" data-i="${i}">
+        <div class="top"><span class="badge">${a.s}:${a.n}</span><button class="play" data-p="${i}">▶</button></div>
+        <div class="ar" style="font-size:${S.fs}px">${text}</div>${tr}</div>`;
+    }
+  });
+  flush();
+  html += '</div>';
+  main.innerHTML = html;
+  if (scrollTop) main.scrollTop = 0;
+
+  main.querySelectorAll('[data-p]').forEach(b=>b.onclick=e=>{e.stopPropagation();playFrom(+b.dataset.p)});
+  main.querySelectorAll('.ay').forEach(s=>s.onclick=()=>playFrom(+s.dataset.i));
+  // preload next page
+  if (S.page<604) loadPage(S.page+1).catch(()=>{});
+}
+function header(a){
+  const s = S.surahs.find(x=>x.number===a.s);
+  const info = s ? `${s.numberOfAyahs} oyat · ${s.revelationType==='Meccan'?'Makkiy':'Madaniy'}` : '';
+  let h = `<div class="surah-head"><div class="ar">سورة ${a.sName.replace('سُورَةُ','').trim()}</div><b>${a.s}. ${a.sEn}</b><small>${info}</small></div>`;
+  if (a.s!==1 && a.s!==9) h += '<div class="bism">بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</div>';
+  return h;
+}
+const esc = s => s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+
+/* ---------- audio ---------- */
+function audioUrl(a){ return `https://cdn.islamic.network/quran/audio/128/${S.rec}/${a.g}.mp3`; }
+function mark(i){
+  document.querySelectorAll('.on').forEach(e=>e.classList.remove('on'));
+  document.querySelectorAll(`[data-i="${i}"]`).forEach(e=>e.classList.add('on'));
+  const el = document.querySelector(`[data-i="${i}"]`);
+  if (el) el.scrollIntoView({block:'center',behavior:'smooth'});
+}
+function setPlayUI(){
+  $('playAll').textContent = S.playing ? '❚❚ To\'xtatish' : '▶ Tinglash';
+  document.querySelectorAll('.play').forEach(b=>b.textContent = (S.playing && +b.dataset.p===S.cur)?'❚❚':'▶');
+}
+function playFrom(i){
+  if (S.playing && S.cur===i){ stop(); return; }
+  S.cur = i; S.playing = true;
+  audio.src = audioUrl(S.ayahs[i]);
+  audio.play().catch(()=>{S.playing=false;setPlayUI();});
+  mark(i); setPlayUI();
+}
+function stop(){ audio.pause(); S.playing=false; setPlayUI(); }
+audio.addEventListener('ended', async ()=>{
+  if (S.cur < S.ayahs.length-1){ playFrom(S.cur+1); return; }
+  if (S.auto && S.page<604){
+    S.page++; await render(); playFrom(0);
+  } else stop();
+});
+audio.addEventListener('error', ()=>{ S.playing=false; setPlayUI(); });
+$('playAll').onclick = ()=>{
+  if (S.playing){ stop(); return; }
+  if (S.cur>=0 && audio.src && audio.currentTime>0 && !audio.ended){ S.playing=true; audio.play(); setPlayUI(); return; }
+  playFrom(Math.max(S.cur,0));
+};
+
+/* ---------- navigation ---------- */
+async function go(n, keepPlay=false){
+  n = Math.min(604, Math.max(1, n));
+  if (!keepPlay) stop();
+  S.page = n; await render();
+}
+$('prev').onclick = ()=>go(S.page-1);
+$('next').onclick = ()=>go(S.page+1);
+$('goPage').onclick = ()=>{
+  const v = prompt('Sahifa raqami (1–604):', S.page);
+  if (v && +v>=1 && +v<=604) go(+v);
+};
+
+/* Swipe */
+let tx=0, ty=0;
+$('main').addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});
+$('main').addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty;
+  if (Math.abs(dx)>90 && Math.abs(dy)<50) go(S.page + (dx<0?1:-1));
+},{passive:true});
+
+/* Surah list */
+function openList(){
+  $('ovList').classList.add('show'); drawList(''); 
+}
+function drawList(q){
+  q = q.trim().toLowerCase();
+  const items = S.surahs.filter(s=>!q || String(s.number)===q || s.englishName.toLowerCase().includes(q) || s.name.includes(q));
+  $('slist').innerHTML = items.map(s=>`<div class="s-item" data-s="${s.number}">
+    <div class="s-n"><span>${s.number}</span></div>
+    <div class="s-m"><div>${s.englishName}</div><small>${s.numberOfAyahs} oyat · ${s.revelationType==='Meccan'?'Makkiy':'Madaniy'}</small></div>
+    <div class="s-ar">${s.name.replace('سُورَةُ','').trim()}</div></div>`).join('') || '<div class="err">Topilmadi</div>';
+  $('slist').querySelectorAll('[data-s]').forEach(el=>el.onclick=async()=>{
+    $('ovList').classList.remove('show'); stop();
+    try{
+      const d = await getJSON(`${API}/ayah/${el.dataset.s}:1`);
+      go(d.page);
+    }catch(e){ alert('Yuklab bo\'lmadi'); }
+  });
+}
+$('btnList').onclick = openList; $('title').onclick = openList;
+$('q').oninput = e=>drawList(e.target.value);
+
+/* Settings */
+function chips(id, opts, cur, onPick){
+  const box = $(id); box.innerHTML='';
+  opts.forEach(([v,l])=>{
+    const c = document.createElement('div'); c.className='chip'+(v===cur?' sel':''); c.textContent=l;
+    c.onclick=()=>{onPick(v);}; box.appendChild(c);
+  });
+}
+function drawSettings(){
+  chips('optView',[['ayat','Oyatma-oyat'],['mushaf','Mushaf']],S.view,v=>{S.view=v;store.set('view',v);drawSettings();render(false)});
+  chips('optTr',[['uz','O\'zbekcha'],['ru','Русский'],['both','Ikkalasi'],['off','Yo\'q']],S.tr,v=>{S.tr=v;store.set('tr',v);drawSettings();render(false)});
+  chips('optRec',RECITERS,S.rec,v=>{S.rec=v;store.set('rec',v);drawSettings();if(S.playing)playFrom(S.cur)});
+  chips('optAuto',[[true,'Ha'],[false,'Yo\'q']],S.auto,v=>{S.auto=v;store.set('auto',v);drawSettings()});
+  $('fs').value = S.fs;
+}
+$('btnSet').onclick = ()=>{drawSettings();$('ovSet').classList.add('show')};
+$('fs').oninput = e=>{S.fs=+e.target.value;store.set('fs',S.fs);
+  document.querySelectorAll('.mushaf,.card .ar').forEach(el=>el.style.fontSize=S.fs+'px')};
+['ovList','ovSet'].forEach(id=>$(id).addEventListener('click',e=>{if(e.target.id===id)e.target.classList.remove('show')}));
+
+render();
+</script>
+</body>
+</html>
